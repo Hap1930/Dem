@@ -1,0 +1,54 @@
+CREATE PROCEDURE CheckEmail()
+BEGIN
+    SELECT email_k AS Email,
+        CASE
+            WHEN email_k REGEXP '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$' THEN 1
+            ELSE 0
+        END AS IsValid
+    FROM klient;
+END //
+
+DELIMITER ;
+
+CALL CheckEmail();
+
+DELIMITER //
+
+CREATE TRIGGER tovar_update
+BEFORE UPDATE ON tovar
+FOR EACH ROW
+BEGIN
+    IF NEW.price_t <> OLD.price_t THEN
+        INSERT INTO HistoryCost (change_date, article_t, old_price, new_price)
+        VALUES (NOW(), OLD.article_t, OLD.price_t, NEW.price_t);
+    END IF;
+END;
+//
+
+DELIMITER ;
+
+
+SELECT k.id_k, k.first_name_k, k.last_name_k, z.id_z, z.date_z, SUM(t.price_t * cz.kolvo) AS total_payment
+FROM klient k
+JOIN zakazi z ON k.id_k = z.id_k
+JOIN consist_zakaz cz ON z.id_z = cz.id_z
+JOIN tovar t ON cz.article_t = t.article_t
+GROUP BY k.id_k, z.id_z;
+
+
+DELETE FROM HistoryCost
+WHERE article_t IN (
+    SELECT article_t FROM tovar WHERE expiration_date_t < CURDATE()
+);
+
+DELETE FROM tovar
+WHERE expiration_date_t < CURDATE();
+SELECT * FROM TradeCompany.tovar;
+
+UPDATE tovar
+SET price_t = price_t * 0.75
+WHERE country_t = 'Россия';
+SELECT * FROM TradeCompany.tovar;
+
+
+

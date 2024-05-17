@@ -1,0 +1,72 @@
+CREATE DATABASE  TradeCompany;
+
+USE TradeCompany;
+
+CREATE TABLE  klient (
+    id_k INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    email_k VARCHAR(70) UNIQUE,
+    first_name_k VARCHAR(50) NOT NULL,
+    last_name_k VARCHAR(50) NOT NULL,
+    middle_name_k VARCHAR(60),
+    birth_date_k DATE,
+    phone_k VARCHAR(16) NOT NULL,
+    city_k VARCHAR(100),
+    street_k VARCHAR(100),
+    house_k VARCHAR(100),
+    apartment_k VARCHAR(20)
+);
+
+CREATE TABLE sotr (
+    guid_s CHAR(36) PRIMARY KEY  default(uuid()),
+    first_name_s VARCHAR(50) NOT NULL,
+    last_name_s VARCHAR(50) NOT NULL,
+    middle_name_s VARCHAR(60),
+    birth_date_s DATE NOT NULL,
+    phone_s VARCHAR(16) NOT NULL,
+    city_s VARCHAR(100) NOT NULL,
+    street_s VARCHAR(100) NOT NULL,
+    house_s VARCHAR(100) NOT NULL,
+    apartment_s VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE  zakazi (
+    id_z INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    id_k INT NOT NULL,
+    guid_s CHAR(36) NOT NULL,
+    date_z DATE default(current_date()),
+    payment_method ENUM('Наличные', 'Безналичный'),
+    statuss ENUM('Новый', 'В работе', 'Выполнен'),
+    FOREIGN KEY (id_k) REFERENCES klient(id_k) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (guid_s) REFERENCES sotr(guid_s) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE tovar (
+    article_t VARCHAR(255) PRIMARY KEY NOT NULL,
+    namee_t VARCHAR(100) NOT NULL,
+    category_t VARCHAR(100) NOT NULL,
+    price_t DECIMAL(10, 2) NOT NULL,
+    unit_t VARCHAR(50) NOT NULL,
+    production_date_t DATE NOT NULL,
+    expiration_date_t DATE NOT NULL,
+    maker_t VARCHAR(100) NOT NULL,
+    country_t VARCHAR(60) NOT NULL
+);
+
+CREATE TABLE consist_zakaz (
+	id_z INT NOT NULL,
+    article_t VARCHAR(255) NOT NULL,
+    kolvo INT NOT NULL,
+    PRIMARY KEY (id_z, article_t),
+    FOREIGN KEY (id_z) REFERENCES zakazi(id_z) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (article_t) REFERENCES tovar(article_t) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+INSERT INTO klient (email_k, first_name_k, last_name_k, middle_name_k, birth_date_k, phone_k, city_k, street_k, house_k, apartment_k)
+VALUES
+('client1@example.com', 'Иван', 'Иванов', 'Иванович', '1990-01-01', '+79123456789', 'Москва', 'Ленина', '1', '1'),
+
+uuid binary(16) primary key not null default (uuid_to_bin(uuid())),
+insert into employes (uuid, name, last_name, second_name, birthdate, phone, city, atreet, house, apart) values (UUID_TO_BIN('3184292e-e49b-11ee-859f-00155df54038'), 'Петрова', 'Анна', 'Сергеевна', '2004-04-09', '89765676677', 'Москва', 'Иванова', '8', '34');
+
+
